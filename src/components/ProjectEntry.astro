@@ -1,0 +1,115 @@
+---
+import VimeoPlayer from "./VimeoPlayer.astro";
+
+interface Props {
+  title: string;
+  slug: string;
+  year: number;
+  category: string;
+  tags: string[];
+  description: string;
+  vimeoId: string;
+  vimeoHash?: string;
+  thumbnail?: string;
+  featured?: boolean;
+  index: number;
+  orientation?: "horizontal" | "vertical";
+}
+
+const {
+  title,
+  slug,
+  year,
+  category,
+  tags,
+  description,
+  vimeoId,
+  vimeoHash = "",
+  thumbnail,
+  featured = false,
+  index,
+  orientation = "horizontal",
+} = Astro.props;
+
+const isVertical = orientation === "vertical";
+
+const indexPad = String(index + 1).padStart(2, "0");
+---
+
+<article
+  class={`project-entry relative py-12 md:py-20 border-b border-white/5 reveal ${featured ? "project-entry--featured" : ""}`}
+  data-index={index}
+  aria-label={`Proyecto: ${title}`}
+>
+  <!-- Decorative Index number -->
+  <span
+    class="pe-index absolute top-12 right-0 text-7xl md:text-[120px] font-extrabold leading-none text-white/[0.02] font-headline select-none pointer-events-none"
+    aria-hidden="true"
+  >
+    {indexPad}
+  </span>
+
+  <div
+    class="pe-inner grid grid-cols-1 md:grid-cols-12 gap-8 md:gap-12 items-center"
+  >
+    <!-- Video Player Container -->
+    <div
+      class={`pe-video overflow-hidden rounded-xl bg-surface-container-low shadow-2xl ${isVertical ? "md:col-span-3 md:col-start-2" : `md:col-span-7 ${index % 2 === 1 ? "md:order-last" : ""}`}`}
+    >
+      <VimeoPlayer
+        vimeoId={vimeoId}
+        vimeoHash={vimeoHash}
+        thumbnail={thumbnail}
+        title={title}
+        orientation={orientation}
+      />
+    </div>
+
+    <!-- Metadata Panel -->
+    <div
+      class={`pe-meta flex flex-col gap-4 ${isVertical ? "md:col-span-6 md:col-start-6" : "md:col-span-5"}`}
+    >
+      <div
+        class="pe-meta-top flex items-center gap-4 text-xs font-semibold tracking-wider uppercase"
+      >
+        <span class="pe-category text-secondary">{category}</span>
+        <span class="pe-year text-on-tertiary-fixed-variant">{year}</span>
+      </div>
+
+      <h3
+        class="pe-title font-headline text-3xl md:text-4xl lg:text-5xl font-extrabold text-white leading-tight"
+      >
+        {title}
+      </h3>
+
+      <p
+        class="pe-desc text-sm md:text-base text-on-surface-variant leading-relaxed max-w-md"
+      >
+        {description}
+      </p>
+
+      <div class="pe-tags flex flex-wrap gap-2 mt-2">
+        {
+          tags.map((tag) => (
+            <span class="pe-tag text-[10px] tracking-wider uppercase px-3 py-1 rounded bg-white/[0.03] text-white/60 border border-white/5 font-mono">
+              {tag}
+            </span>
+          ))
+        }
+      </div>
+
+      <div class="mt-4">
+        <a
+          href={`/proyectos/${slug}`}
+          class="inline-flex items-center gap-2 text-xs font-bold tracking-widest uppercase text-primary hover:text-white transition-colors group"
+        >
+          Ver caso de estudio
+          <span
+            class="transform translate-x-0 group-hover:translate-x-1 transition-transform"
+            >→</span
+          >
+        </a>
+      </div>
+    </div>
+  </div>
+</article>

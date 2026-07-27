@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head><meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" /><title>Formulario Netlify — uso interno</title></head>
+  <body>
+    <!--
+      Formulario estático para detección de Netlify Forms en el build estático.
+      Este archivo nunca se muestra al usuario — solo lo lee el bot de Netlify.
+    -->
+    <form
+      name="contacto-chalco-ed"
+      netlify
+      netlify-honeypot="bot-field"
+      hidden
+    >
+      <input type="hidden" name="form-name" value="contacto-chalco-ed" />
+
+      <!-- Honeypot: oculto para humanos, visible para bots -->
+      <p hidden>
+        <label>No llenar: <input name="bot-field" /></label>
+      </p>
+
+      <input type="text"  name="nombre"         />
+      <input type="email" name="correo"          />
+      <select             name="tipo_proyecto">
+        <option value="edicion">Edición de video</option>
+        <option value="motion">Motion Graphics</option>
+        <option value="vfx">VFX / Compositing</option>
+        <option value="social">Social Media / Reels</option>
+        <option value="documental">Documental</option>
+        <option value="otro">Otro</option>
+      </select>
+      <textarea           name="mensaje"></textarea>
+    </form>
+  </body>
+</html>

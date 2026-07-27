@@ -1,0 +1,537 @@
+---
+import { getCollection } from "astro:content";
+import Layout from "../layouts/Layout.astro";
+import { STUDIO } from "../config";
+import ProjectEntry from "../components/ProjectEntry.astro";
+import ReelCard from "../components/ReelCard.astro";
+import { reels, reelCategories } from "../data/reels";
+
+const allProjects = await getCollection("projects");
+// Exclude showreel-vfx — lives in the immersive section, not in the projects list
+const sortedProjects = allProjects
+  .filter((p) => p.id !== "showreel-vfx")
+  .sort((a, b) => b.data.year - a.data.year);
+---
+
+<Layout title={`${STUDIO.name} | The Art of Motion & Visual Stories`}>
+  <!-- Hero Section with Parallax Background & Sunset Glow -->
+  <section
+    class="relative h-screen w-full flex items-center justify-center overflow-hidden"
+  >
+    <div class="absolute inset-0 z-0">
+      <!-- High contrast parallax visual representation -->
+      <div
+        class="absolute inset-0 bg-cover bg-center bg-no-repeat bg-fixed opacity-60"
+        style="background-image: linear-gradient(135deg, #0a0010 0%, #1a0050 40%, #0d1a2e 70%, #101415 100%);"
+      >
+      </div>
+      <div
+        class="absolute inset-0 bg-gradient-to-t from-background via-background/60 to-transparent"
+      >
+      </div>
+      <div
+        class="hero-vignette absolute inset-0 bg-radial-[circle_at_center,transparent_0%,rgba(16,20,21,0.85)_100%]"
+      >
+      </div>
+      <div
+        class="hero-glow absolute -top-40 left-1/2 -translate-x-1/2 w-full h-[600px] pointer-events-none"
+      >
+      </div>
+    </div>
+
+    <div
+      class="relative z-10 text-center px-6 max-w-4xl flex flex-col items-center"
+    >
+      <span
+        class="inline-block text-secondary font-mono text-xs tracking-[0.2em] mb-4 uppercase animate-fade-in opacity-0"
+        style="animation: fadeIn 1s ease-out forwards; animation-delay: 0.1s;"
+      >
+        Post-Producción
+      </span>
+      <h1
+        class="font-headline text-5xl md:text-7xl lg:text-8xl font-extrabold text-white mb-6 leading-[1.05] tracking-tight filter drop-shadow-[0_0_20px_rgba(208,188,255,0.25)] animate-fade-in opacity-0"
+        style="animation: fadeIn 1s ease-out forwards; animation-delay: 0.3s;"
+      >
+        Movimiento que <br class="hidden md:inline" /><span
+          class="text-transparent bg-clip-text bg-gradient-to-r from-primary via-secondary to-primary-container"
+          >Permanece</span
+        >
+      </h1>
+      <p
+        class="text-base md:text-lg lg:text-xl text-on-surface-variant mb-10 max-w-xl leading-relaxed animate-fade-in opacity-0"
+        style="animation: fadeIn 1s ease-out forwards; animation-delay: 0.5s;"
+      >
+        Para marcas que necesitan más que un video: edición dinámica,
+        motion graphics, VFX e IA aplicada al contenido visual.
+      </p>
+
+      <div
+        class="flex flex-col sm:flex-row gap-4 items-center animate-fade-in opacity-0"
+        style="animation: fadeIn 1s ease-out forwards; animation-delay: 0.7s;"
+      >
+        <button
+          onclick="document.getElementById('reels')?.scrollIntoView({behavior:'smooth'})"
+          class="bg-gradient-to-r from-primary-container to-secondary-container text-white px-8 py-4 rounded-full text-sm font-bold tracking-wider uppercase flex items-center gap-2 transition-all duration-300 hover:scale-105 active:scale-95 shadow-lg shadow-primary-container/20"
+        >
+          <span class="material-symbols-outlined text-lg">play_arrow</span>
+          Ver Showreel
+        </button>
+        <a
+          href="#proyectos"
+          class="bg-surface/40 hover:bg-surface/65 border border-white/10 text-white px-8 py-4 rounded-full text-sm font-bold tracking-wider uppercase transition-all duration-300 backdrop-blur-md hover:scale-105 active:scale-95"
+        >
+          Explorar Trabajos
+        </a>
+      </div>
+    </div>
+
+    <!-- Animated bounce down indicator -->
+    <div class="absolute bottom-10 left-1/2 -translate-x-1/2 animate-bounce">
+      <button
+        onclick="document.getElementById('proyectos')?.scrollIntoView({behavior:'smooth'})"
+        aria-label="Ir abajo"
+        class="bg-transparent border-none cursor-pointer"
+      >
+        <span class="material-symbols-outlined text-primary text-4xl hover:text-white transition-colors">keyboard_double_arrow_down</span>
+      </button>
+    </div>
+  </section>
+
+  <!-- ===== SECCIÓN REELS GRID ===== -->
+  <section id="reels-grid" class="px-6 md:px-12 max-w-7xl mx-auto py-24 scroll-mt-20">
+    <div class="reveal flex flex-col md:flex-row md:items-end justify-between mb-16 gap-6">
+      <div>
+        <span class="text-xs font-mono tracking-[0.2em] text-secondary uppercase block mb-3">Social Media · Branded Content</span>
+        <h2 class="font-headline text-4xl md:text-5xl font-extrabold text-white mb-4">Reels</h2>
+        <p class="text-on-surface-variant text-base max-w-md">Contenido vertical para social media: motion graphics, VFX, edición dinámica y branded content.</p>
+      </div>
+
+      <!-- Filtros -->
+      <div class="flex flex-wrap gap-2 items-center">
+        {reelCategories.map((cat) => (
+          <button
+            class={`reel-filter-chip text-xs tracking-wider uppercase px-4 py-2 rounded-full font-bold border transition-all duration-300 cursor-pointer ${
+              cat === "Principal"
+                ? "bg-primary text-on-primary border-primary shadow-lg shadow-primary/10"
+                : "border-white/10 text-on-surface-variant hover:text-white hover:border-white/30"
+            }`}
+            data-category={cat}
+          >{cat}</button>
+        ))}
+      </div>
+    </div>
+
+    <!-- Grid 9:16 -->
+    <div class="reels-grid grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+      {reels.map((reel) => (
+        <div
+          class="reel-wrapper"
+          data-category={reel.category}
+          data-featured={reel.featured ? "true" : "false"}
+          style={!reel.featured ? "display:none" : ""}
+        >
+          <ReelCard
+            id={reel.id}
+            title={reel.title}
+            client={reel.client}
+            category={reel.category}
+            vimeoId={reel.vimeoId}
+            vimeoHash={reel.vimeoHash}
+            year={reel.year}
+          />
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <!-- ===== SECCIÓN PROYECTOS DESTACADOS (16:9) ===== -->
+  <section id="proyectos" class="px-6 md:px-12 max-w-7xl mx-auto py-24 scroll-mt-20">
+    <div class="reveal text-center mb-16">
+      <span class="text-xs font-mono tracking-[0.2em] text-secondary uppercase">Producción Avanzada</span>
+      <h2 class="font-headline text-4xl md:text-5xl font-extrabold text-white">Formato Largo · Narrativa Visual</h2>
+      <p class="text-on-surface-variant text-base mx-auto mt-3">Trabajos de mayor formato: compositing en cine y narrativa documental.</p>
+    </div>
+
+    <div class="projects-list flex flex-col">
+      {sortedProjects.map((project, index) => (
+        <div class="project-wrapper" data-category={project.data.category}>
+          <ProjectEntry
+            title={project.data.title}
+            slug={project.id}
+            year={project.data.year}
+            category={project.data.category}
+            tags={project.data.tags}
+            description={project.data.description}
+            vimeoId={project.data.vimeoId}
+            vimeoHash={project.data.vimeoHash}
+            thumbnail={project.data.thumbnail}
+            featured={project.data.featured}
+            index={index}
+            orientation={project.data.orientation}
+          />
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <!-- Full Width Immersive Reel Section -->
+  <section
+    id="reels"
+    class="relative py-32 md:py-48 w-full group overflow-hidden reveal"
+    style="background-image: linear-gradient(160deg, #1f0500 10%, #3a1500 35%, #100d2e 70%, #101415 100%)"
+  >
+    <div class="absolute inset-0 bg-gradient-to-t from-background via-transparent to-background"></div>
+
+    <div class="relative z-10 flex flex-col items-center justify-center text-center px-6 max-w-3xl mx-auto">
+      <button
+        class="showreel-play-btn w-20 h-20 rounded-full border border-white/30 flex items-center justify-center mb-8 group-hover:scale-110 group-hover:bg-white/10 group-hover:border-white transition-all duration-500 backdrop-blur-md cursor-pointer"
+        aria-label="Reproducir ShowReel VFX"
+      >
+        <span class="material-symbols-outlined text-white text-3xl transform group-hover:translate-x-0.5 transition-transform">play_arrow</span>
+      </button>
+      <h2 class="font-headline text-4xl md:text-6xl font-extrabold text-white tracking-tight leading-none group-hover:scale-[1.02] transition-transform duration-700">
+        ShowReel VFX · Publicidad
+      </h2>
+      <p class="text-xs md:text-sm font-semibold tracking-[0.25em] text-secondary mt-4 uppercase">
+        Efectos visuales, compositing y publicidad cinematográfica
+      </p>
+      <a
+        href="/proyectos/showreel-vfx"
+        class="mt-8 text-xs font-bold tracking-widest uppercase text-white/40 hover:text-white/70 transition-colors"
+      >
+        Ver caso de estudio →
+      </a>
+    </div>
+  </section>
+
+  <!-- Process / Services Section (Bento Grid) -->
+  <section
+    id="proceso"
+    class="px-6 md:px-12 max-w-7xl mx-auto py-24 scroll-mt-20"
+  >
+    <div class="reveal text-center mb-16">
+      <span
+        class="text-xs font-mono tracking-[0.2em] text-secondary uppercase block mb-3"
+        >Disciplinas</span
+      >
+      <h2 class="font-headline text-4xl md:text-5xl font-extrabold text-white">
+        Post-producción · Lo que hacemos
+      </h2>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8 reveal stagger-2">
+      <!-- Bento Item 1 -->
+      <div
+        class="group p-8 rounded-2xl glass-panel hover:border-primary/40 hover:-translate-y-1.5 transition-all duration-300 flex flex-col gap-6 cursor-default"
+      >
+        <div
+          class="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary group-hover:rotate-12 transition-transform"
+        >
+          <span class="material-symbols-outlined text-2xl">smart_toy</span>
+        </div>
+        <h3 class="font-headline text-xl font-bold text-white">
+          IA Aplicada
+        </h3>
+        <p class="text-sm text-on-surface-variant leading-relaxed">
+          Integración de herramientas de inteligencia artificial al flujo de post-producción (Avatares, IA Generativa):
+          compositing híbrido y experimentación visual. Para desarollo más avanzado visita el ecosistema
+          <a href="https://chalco-lab.netlify.app/#pipeline" target="_blank" rel="noopener noreferrer" class="text-secondary hover:text-white transition-colors underline underline-offset-2">CHALCO LABS</a>
+        </p>
+      </div>
+
+      <!-- Bento Item 2 -->
+      <div
+        class="group p-8 rounded-2xl glass-panel hover:border-secondary/40 hover:-translate-y-1.5 transition-all duration-300 flex flex-col gap-6 cursor-default"
+      >
+        <div
+          class="w-12 h-12 rounded-xl bg-secondary/10 flex items-center justify-center text-secondary group-hover:rotate-12 transition-transform"
+        >
+          <span class="material-symbols-outlined text-2xl">auto_awesome</span>
+        </div>
+        <h3 class="font-headline text-xl font-bold text-white">
+          Motion Graphics
+        </h3>
+        <p class="text-sm text-on-surface-variant leading-relaxed">
+          Animaciones tipográficas, transiciones personalizadas y
+          elementos gráficos en movimiento integrados al footage.
+        </p>
+      </div>
+
+      <!-- Bento Item 3 -->
+      <div
+        class="group p-8 rounded-2xl glass-panel hover:border-primary-container/40 hover:-translate-y-1.5 transition-all duration-300 flex flex-col gap-6 cursor-default"
+      >
+        <div
+          class="w-12 h-12 rounded-xl bg-primary-container/10 flex items-center justify-center text-primary-container group-hover:rotate-12 transition-transform"
+        >
+          <span class="material-symbols-outlined text-2xl"
+            >layers</span
+          >
+        </div>
+        <h3 class="font-headline text-xl font-bold text-white">
+          VFX & Compositing
+        </h3>
+        <p class="text-sm text-on-surface-variant leading-relaxed">
+          Integración de efectos visuales en producción real: keying,
+          tracking, simulaciones y compositing en Nuke, Fusion y After Effects
+          para publicidad y proyectos narrativos.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Contact Form Section -->
+  <section id="contacto" class="py-24 px-6 md:px-12 max-w-3xl mx-auto scroll-mt-20 reveal">
+    <div class="text-center mb-12">
+      <span class="text-xs font-mono tracking-[0.2em] text-secondary uppercase block mb-3">Trabajemos juntos</span>
+      <h2 class="font-headline text-4xl md:text-5xl font-extrabold text-white leading-tight">
+        ¿Listo para dar vida<br class="hidden sm:inline" /> a tu historia?
+      </h2>
+      <p class="text-on-surface-variant text-base mt-4 max-w-md mx-auto leading-relaxed">
+        Abierto a colaboraciones en social media, branded content y VFX.
+      </p>
+    </div>
+
+    <!-- Form card -->
+    <div class="glass-panel rounded-2xl p-8 md:p-10">
+      <form
+        id="contact-form"
+        name="contacto-chalco-ed"
+        method="POST"
+        data-netlify="true"
+        netlify-honeypot="bot-field"
+        novalidate
+      >
+        <!-- Netlify hidden fields -->
+        <input type="hidden" name="form-name" value="contacto-chalco-ed" />
+        <p hidden><label>No llenar: <input name="bot-field" /></label></p>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6">
+          <!-- Nombre -->
+          <div class="flex flex-col gap-2">
+            <label for="nombre" class="text-xs font-bold tracking-wider uppercase text-on-surface-variant">
+              Nombre <span class="text-secondary">*</span>
+            </label>
+            <input
+              id="nombre"
+              name="nombre"
+              type="text"
+              required
+              autocomplete="name"
+              placeholder="Tu nombre"
+              class="bg-surface-container border border-white/10 rounded-xl px-4 py-3 text-sm text-on-surface placeholder:text-on-surface-variant/40 focus:outline-none focus:border-primary/60 focus:ring-1 focus:ring-primary/30 transition-colors"
+            />
+          </div>
+
+          <!-- Correo -->
+          <div class="flex flex-col gap-2">
+            <label for="correo" class="text-xs font-bold tracking-wider uppercase text-on-surface-variant">
+              Correo <span class="text-secondary">*</span>
+            </label>
+            <input
+              id="correo"
+              name="correo"
+              type="email"
+              required
+              autocomplete="email"
+              placeholder="tu@correo.com"
+              class="bg-surface-container border border-white/10 rounded-xl px-4 py-3 text-sm text-on-surface placeholder:text-on-surface-variant/40 focus:outline-none focus:border-primary/60 focus:ring-1 focus:ring-primary/30 transition-colors"
+            />
+          </div>
+        </div>
+
+        <!-- Tipo de proyecto -->
+        <div class="flex flex-col gap-2 mb-6">
+          <label for="tipo_proyecto" class="text-xs font-bold tracking-wider uppercase text-on-surface-variant">
+            Tipo de proyecto <span class="text-secondary">*</span>
+          </label>
+          <select
+            id="tipo_proyecto"
+            name="tipo_proyecto"
+            required
+            class="bg-surface-container border border-white/10 rounded-xl px-4 py-3 text-sm text-on-surface focus:outline-none focus:border-primary/60 focus:ring-1 focus:ring-primary/30 transition-colors appearance-none cursor-pointer"
+          >
+            <option value="" disabled selected class="text-on-surface-variant/40">Selecciona un servicio…</option>
+            <option value="edicion">Edición de video</option>
+            <option value="motion">Motion Graphics</option>
+            <option value="vfx">VFX / Compositing</option>
+            <option value="social">Social Media / Reels</option>
+            <option value="documental">Documental</option>
+            <option value="otro">Otro</option>
+          </select>
+        </div>
+
+        <!-- Mensaje -->
+        <div class="flex flex-col gap-2 mb-8">
+          <label for="mensaje" class="text-xs font-bold tracking-wider uppercase text-on-surface-variant">
+            Mensaje <span class="text-secondary">*</span>
+          </label>
+          <textarea
+            id="mensaje"
+            name="mensaje"
+            required
+            rows="5"
+            placeholder="Cuéntame sobre tu proyecto, plazos y referencias que tengas…"
+            class="bg-surface-container border border-white/10 rounded-xl px-4 py-3 text-sm text-on-surface placeholder:text-on-surface-variant/40 focus:outline-none focus:border-primary/60 focus:ring-1 focus:ring-primary/30 transition-colors resize-none"
+          ></textarea>
+        </div>
+
+        <!-- Submit -->
+        <button
+          id="submit-btn"
+          type="submit"
+          class="sunset-gradient w-full py-4 rounded-xl text-sm font-bold tracking-wider uppercase text-white hover:shadow-[0_0_30px_rgba(236,106,6,0.35)] active:scale-[0.98] transition-all duration-300 flex items-center justify-center gap-2"
+        >
+          <span id="btn-label">Enviar mensaje</span>
+          <span id="btn-spinner" class="hidden w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
+        </button>
+
+        <!-- Status messages -->
+        <p id="form-success" class="hidden mt-5 text-center text-sm font-semibold text-secondary">
+          ✓ Mensaje enviado. Te respondo pronto.
+        </p>
+        <p id="form-error" class="hidden mt-5 text-center text-sm font-semibold text-error">
+          Hubo un error al enviar. Intenta de nuevo o escríbeme a
+          <a href={`mailto:${STUDIO.email}`} class="underline underline-offset-2 hover:text-white transition-colors">{STUDIO.email}</a>.
+        </p>
+      </form>
+    </div>
+  </section>
+</Layout>
+
+<style>
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(16px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+</style>
+
+<script>
+  function setupReelFilters() {
+    const chips = document.querySelectorAll<HTMLButtonElement>('.reel-filter-chip');
+    const wrappers = document.querySelectorAll<HTMLElement>('.reel-wrapper');
+
+    chips.forEach((chip) => {
+      chip.addEventListener('click', () => {
+        const cat = chip.dataset.category!;
+
+        chips.forEach((c) => {
+          c.classList.remove('bg-primary', 'text-on-primary', 'border-primary', 'shadow-lg', 'shadow-primary/10');
+          c.classList.add('border-white/10', 'text-on-surface-variant', 'hover:text-white', 'hover:border-white/30');
+        });
+        chip.classList.remove('border-white/10', 'text-on-surface-variant', 'hover:text-white', 'hover:border-white/30');
+        chip.classList.add('bg-primary', 'text-on-primary', 'border-primary', 'shadow-lg', 'shadow-primary/10');
+
+        wrappers.forEach((w) => {
+          let match = false;
+          if (cat === 'Todos') {
+            match = true;
+          } else if (cat === 'Principal') {
+            match = w.dataset.featured === 'true';
+          } else {
+            match = w.dataset.category === cat;
+          }
+          w.style.display = match ? 'block' : 'none';
+        });
+      });
+    });
+  }
+
+  setupReelFilters();
+
+  document.addEventListener("astro:page-load", setupReelFilters);
+
+  // ── Showreel overlay ──────────────────────────────────────────
+  function setupShowreelHero() {
+    const btn = document.querySelector<HTMLButtonElement>('.showreel-play-btn');
+    if (!btn || btn.dataset.initialized) return;
+    btn.dataset.initialized = 'true';
+
+    btn.addEventListener('click', () => {
+      const src = 'https://player.vimeo.com/video/1155606625?autoplay=1&title=0&byline=0&portrait=0&dnt=1&color=ec6a06&h=37764c1632';
+
+      const overlay = document.createElement('div');
+      overlay.className = 'fixed inset-0 z-50 bg-black/95 flex items-center justify-center';
+
+      const closeBtn = document.createElement('button');
+      closeBtn.className = 'absolute top-6 right-6 w-10 h-10 rounded-full border border-white/20 bg-white/10 text-white/80 hover:text-white hover:bg-white/20 text-lg flex items-center justify-center transition-all duration-200 backdrop-blur-md z-10';
+      closeBtn.setAttribute('aria-label', 'Cerrar');
+      closeBtn.textContent = '✕';
+
+      const iframe = document.createElement('iframe');
+      iframe.src = src;
+      iframe.className = 'w-full max-w-5xl aspect-video rounded-xl';
+      iframe.allow = 'autoplay; fullscreen; picture-in-picture';
+      iframe.allowFullscreen = true;
+
+      overlay.appendChild(closeBtn);
+      overlay.appendChild(iframe);
+      document.body.appendChild(overlay);
+
+      closeBtn.addEventListener('click', () => overlay.remove());
+      overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.remove(); });
+      const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') { overlay.remove(); document.removeEventListener('keydown', onKey); } };
+      document.addEventListener('keydown', onKey);
+      const onPop = () => { overlay.remove(); window.removeEventListener('popstate', onPop); };
+      window.addEventListener('popstate', onPop);    });
+  }
+
+  setupShowreelHero();
+  document.addEventListener('astro:page-load', setupShowreelHero);
+
+  // ── Contact form ──────────────────────────────────────────────
+  function setupContactForm() {
+    const form = document.getElementById('contact-form') as HTMLFormElement | null;
+    if (!form || form.dataset.initialized) return;
+    form.dataset.initialized = 'true';
+
+    const btn       = document.getElementById('submit-btn')!;
+    const label     = document.getElementById('btn-label')!;
+    const spinner   = document.getElementById('btn-spinner')!;
+    const msgOk     = document.getElementById('form-success')!;
+    const msgErr    = document.getElementById('form-error')!;
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      // Reset state
+      msgOk.classList.add('hidden');
+      msgErr.classList.add('hidden');
+
+      // Sending state
+      label.textContent = 'Enviando…';
+      spinner.classList.remove('hidden');
+      btn.setAttribute('disabled', '');
+
+      try {
+        const res = await fetch('/', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: new URLSearchParams(new FormData(form) as any).toString(),
+        });
+
+        if (res.ok) {
+          form.reset();
+          msgOk.classList.remove('hidden');
+        } else {
+          throw new Error(`${res.status}`);
+        }
+      } catch {
+        msgErr.classList.remove('hidden');
+      } finally {
+        label.textContent = 'Enviar mensaje';
+        spinner.classList.add('hidden');
+        btn.removeAttribute('disabled');
+      }
+    });
+  }
+
+  setupContactForm();
+  document.addEventListener('astro:page-load', setupContactForm);
+</script>

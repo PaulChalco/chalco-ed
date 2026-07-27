@@ -1,0 +1,120 @@
+---
+interface Props {
+  id: string;
+  title: string;
+  client: string;
+  category: string;
+  vimeoId: string;
+  vimeoHash: string;
+  year: number;
+}
+
+const { id, title, client, category, vimeoId, vimeoHash, year } = Astro.props;
+const hashParam = vimeoHash ? `&h=${vimeoHash}` : '';
+const embedUrl = `https://player.vimeo.com/video/${vimeoId}?autoplay=1&loop=0&title=0&byline=0&portrait=0&dnt=1&color=ec6a06${hashParam}`;
+const thumbUrl = `https://vumbnail.com/${vimeoId}.jpg`;
+---
+
+<div
+  class="reel-card relative aspect-[9/16] rounded-xl overflow-hidden bg-surface-container-low border border-white/5 cursor-pointer group"
+  data-vimeo-id={vimeoId}
+  data-embed-url={embedUrl}
+  data-category={category}
+  data-reel-id={id}
+>
+  <!-- Thumbnail -->
+  <div class="reel-thumb absolute inset-0 transition-all duration-500">
+    <img
+      src={thumbUrl}
+      alt={title}
+      loading="lazy"
+      decoding="async"
+      class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+    />
+    <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
+
+    <!-- Play button -->
+    <div class="absolute inset-0 flex items-center justify-center">
+      <div class="w-12 h-12 rounded-full border border-secondary/50 bg-secondary/10 text-secondary flex items-center justify-center transition-all duration-300 group-hover:scale-110 group-hover:bg-secondary/20 group-hover:border-secondary backdrop-blur-sm">
+        <span class="text-base ml-0.5">▶</span>
+      </div>
+    </div>
+
+    <!-- Meta info -->
+    <div class="absolute bottom-0 left-0 right-0 p-4">
+      <p class="text-[10px] font-mono tracking-wider uppercase text-secondary/80 mb-1">{category} · {year}</p>
+      <h3 class="text-sm font-bold text-white leading-tight">{title}</h3>
+      <p class="text-[11px] text-white/50 mt-0.5">{client}</p>
+    </div>
+  </div>
+
+  <!-- Player -->
+  <div
+    class="reel-player absolute inset-0 opacity-0 pointer-events-none transition-opacity duration-300"
+    aria-hidden="true"
+  >
+    <button
+      class="reel-close absolute top-3 right-3 z-20 w-8 h-8 rounded-full border border-white/10 bg-black/70 text-white/70 text-xs flex items-center justify-center transition-all duration-200 hover:bg-black/90 hover:text-white backdrop-blur-md"
+      aria-label="Cerrar"
+    >✕</button>
+  </div>
+</div>
+
+<style>
+  .reel-player.active {
+    opacity: 1;
+    pointer-events: all;
+  }
+  .reel-thumb.hidden-thumb {
+    opacity: 0;
+    pointer-events: none;
+  }
+</style>
+
+<script>
+  function setupReelCards() {
+    document.querySelectorAll<HTMLElement>('.reel-card').forEach((card) => {
+      if (card.dataset.initialized) return;
+      card.dataset.initialized = 'true';
+
+      const thumb = card.querySelector<HTMLElement>('.reel-thumb')!;
+      const player = card.querySelector<HTMLElement>('.reel-player')!;
+      const closeBtn = card.querySelector<HTMLElement>('.reel-close')!;
+      const embedUrl = card.dataset.embedUrl!;
+
+      function openPlayer() {
+        if (!player.querySelector('iframe')) {
+          const iframe = document.createElement('iframe');
+          iframe.src = embedUrl;
+          iframe.allow = 'autoplay; fullscreen; picture-in-picture';
+          iframe.setAttribute('allowfullscreen', '');
+          iframe.className = 'w-full h-full border-none';
+          player.insertBefore(iframe, closeBtn);
+        }
+        thumb.classList.add('hidden-thumb');
+        player.classList.add('active');
+        player.setAttribute('aria-hidden', 'false');
+      }
+
+      function closePlayer() {
+        player.classList.remove('active');
+        thumb.classList.remove('hidden-thumb');
+        player.setAttribute('aria-hidden', 'true');
+        const iframe = player.querySelector('iframe');
+        if (iframe) iframe.remove();
+      }
+
+      thumb.addEventListener('click', openPlayer);
+      closeBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        closePlayer();
+      });
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && player.classList.contains('active')) closePlayer();
+      });
+    });
+  }
+
+  setupReelCards();
+  document.addEventListener('astro:page-load', setupReelCards);
+</script>

@@ -1,0 +1,130 @@
+---
+import { getCollection, render } from "astro:content";
+import Layout from "../../layouts/Layout.astro";
+import VimeoPlayer from "../../components/VimeoPlayer.astro";
+
+export async function getStaticPaths() {
+  const projects = await getCollection("projects");
+  return projects.map((project) => ({
+    params: { slug: project.id },
+    props: { project },
+  }));
+}
+
+const { project } = Astro.props;
+const {
+  title,
+  year,
+  category,
+  tags,
+  description,
+  vimeoId,
+  vimeoHash,
+  thumbnail,
+} = project.data;
+const { Content } = await render(project);
+---
+
+<Layout title={`${title} | CHALCO ED`} description={description}>
+  <article class="pt-32 pb-24 px-6 md:px-12 max-w-4xl mx-auto">
+    <!-- Breadcrumb -->
+    <nav class="mb-8 reveal">
+      <a
+        href="/"
+        class="inline-flex items-center gap-2 text-xs font-bold tracking-widest uppercase text-on-surface-variant hover:text-primary transition-colors"
+      >
+        ← Volver al portafolio
+      </a>
+    </nav>
+
+    <!-- Header info -->
+    <header class="mb-12 reveal">
+      <div
+        class="flex items-center gap-4 text-xs font-semibold tracking-wider uppercase mb-4"
+      >
+        <span class="text-secondary">{category}</span>
+        <span class="text-on-tertiary-fixed-variant">{year}</span>
+      </div>
+
+      <h1
+        class="font-headline text-4xl md:text-6xl font-extrabold text-white leading-tight mb-6"
+      >
+        {title}
+      </h1>
+
+      <p class="text-lg text-on-surface-variant leading-relaxed">
+        {description}
+      </p>
+    </header>
+
+    <!-- Media embed -->
+    <div
+      class="mb-16 rounded-xl overflow-hidden shadow-2xl border border-white/5 reveal stagger-1"
+    >
+      <VimeoPlayer
+        vimeoId={vimeoId}
+        vimeoHash={vimeoHash}
+        thumbnail={thumbnail}
+        title={title}
+      />
+    </div>
+
+    <!-- Case study body -->
+    <section
+      class="prose prose-invert max-w-none text-on-surface-variant leading-relaxed space-y-6 reveal stagger-2"
+    >
+      <Content />
+    </section>
+
+    <!-- Project navigation footer -->
+    <footer
+      class="mt-20 pt-10 border-t border-white/5 flex justify-between items-center reveal"
+    >
+      <a
+        href="/"
+        class="text-xs font-bold tracking-widest uppercase text-primary hover:text-white transition-colors"
+      >
+        ← Volver al portafolio
+      </a>
+    </footer>
+  </article>
+</Layout>
+
+<style is:global>
+  /* Markdown styling overrides to fit the Cinematic High-Contrast design system */
+  .prose h2 {
+    font-family: "Montserrat", sans-serif;
+    color: #ffffff;
+    font-size: 1.75rem;
+    font-weight: 700;
+    margin-top: 2.5rem;
+    margin-bottom: 1rem;
+    letter-spacing: -0.01em;
+  }
+  .prose h3 {
+    font-family: "Montserrat", sans-serif;
+    color: #ffffff;
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-top: 2rem;
+    margin-bottom: 0.75rem;
+  }
+  .prose p {
+    font-size: 1rem;
+    line-height: 1.75;
+    margin-bottom: 1.5rem;
+    color: #cbc3d7;
+  }
+  .prose ul {
+    list-style-type: disc;
+    padding-left: 1.5rem;
+    margin-bottom: 1.5rem;
+    color: #cbc3d7;
+  }
+  .prose li {
+    margin-bottom: 0.5rem;
+  }
+  .prose li::marker {
+    color: #ffb690; /* Secondary color for bullet points */
+  }
+</style>
